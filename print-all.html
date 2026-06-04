@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Imprimir tablas · Bingo SMJ</title>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;700;800&family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+  <style>
+    /* Esta página existe solo para generar el PDF: mostramos el área de impresión también en pantalla */
+    #area-impresion { display: block !important; }
+    body { background: #fff; }
+  </style>
+</head>
+<body>
+  <div id="area-impresion"></div>
+
+  <script src="js/core.js"></script>
+  <script>
+    (function () {
+      // Configuración del encabezado (la misma que guarda el Generador)
+      var cfg = { evento: 'Gran Bingo Institucional', fecha: '', lema: '¡Mucha suerte a todos!' };
+      try { var j = JSON.parse(localStorage.getItem('smj_bingo_cfg')); if (j) cfg = Object.assign(cfg, j); } catch (e) {}
+
+      // Rango por parámetros de URL (?desde=1&hasta=1000)
+      var qs = new URLSearchParams(location.search);
+      var desde = Math.max(1, parseInt(qs.get('desde') || '1', 10) || 1);
+      var hasta = Math.min(BINGO.TOTAL_TABLAS, parseInt(qs.get('hasta') || String(BINGO.TOTAL_TABLAS), 10) || BINGO.TOTAL_TABLAS);
+      if (hasta < desde) hasta = desde;
+
+      function esc(s) {
+        return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) {
+          return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c];
+        });
+      }
+      function celdaHTML(v) {
+        if (v === 'FREE') return '<div class="celda libre">★<br>LIBRE</div>';
+        return '<div class="celda">' + v + '</div>';
+      }
+      function cartonHTML(carton) {
+        var f = BINGO.folioStr(carton.folio);
+        var cels = '';
+        for (var r = 0; r < 5; r++) for (var c = 0; c < 5; c++) cels += celdaHTML(carton.grid[r][c]);
+        return '<div class="carton">' +
+          '<div class="carton-head">' +
+            '<img class="esc" src="assets/escudo.png" alt="Escudo SMJ">' +
+            '<div class="ct">' +
+              '<div class="inst">Institución Educativa Sor María Juliana</div>' +
+              '<div class="ev">' + esc(cfg.evento) + '</div>' +
+              (cfg.fecha ? '<div class="fe">' + esc(cfg.fecha) + '</div>' : '') +
+            '</div>' +
+            '<div class="folio"><small>FOLIO</small><b>' + f + '</b></div>' +
+          '</div>' +
+          '<div class="bingo-letras"><span>B</span><span>I</span><span>N</span><span>G</span><span>O</span></div>' +
+          '<div class="grid5">' + cels + '</div>' +
+          '<div class="carton-foot"><span class="lema">' + esc(cfg.lema) + '</span><span>N° ' + f + '</span></div>' +
+        '</div>';
+      }
+
+      var html = '', enHoja = 0;
+      for (var f = desde; f <= hasta; f++) {
+        if (enHoja === 0) html += '<div class="hoja">';
+        html += cartonHTML(BINGO.generarCarton(f));
+        enHoja++;
+        if (enHoja === 4) { html += '</div>'; enHoja = 0; }
+      }
+      if (enHoja !== 0) html += '</div>';
+      document.getElementById('area-impresion').innerHTML = html;
+      document.title = 'Bingo SMJ ' + BINGO.folioStr(desde) + '-' + BINGO.folioStr(hasta);
+      window.__listo = true; // señal para el generador de PDF
+    })();
+  </script>
+</body>
+</html>

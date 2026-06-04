@@ -1,0 +1,15 @@
+# Configuración local del entorno de desarrollo
+.claude/
+
+# Archivos del sistema
+.DS_Store
+**/.DS_Store
+Thumbs.db
+
+# PDF generado (pesado, ~23 MB; se regenera desde el Generador)
+Bingo SMJ - 1000 tablas.pdf
+*.pdf
+
+# Temporales
+*.log
+_test_*
