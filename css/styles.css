@@ -304,6 +304,11 @@ img { max-width: 100%; display: block; }
 }
 .tab-num.salido { background: var(--oro); color: #2a1500; font-weight: 800; transform: scale(1.05); box-shadow: 0 0 14px rgba(217,119,6,.5); }
 
+/* selector de voz de la locutora */
+.voz-sel { background: rgba(255,255,255,.06); color: #f7eef0; border: 1px solid rgba(255,255,255,.14);
+  border-radius: 999px; padding: 8px 12px; font-size: .84rem; font-weight: 600; max-width: 210px; cursor: pointer; }
+.voz-sel option { color: #1c0a0e; }
+
 /* Patrón activo (mini) */
 .mini-patron { display: grid; grid-template-columns: repeat(5,1fr); gap: 4px; width: 190px; margin: 0 auto 14px; }
 .mini-patron div { aspect-ratio: 1; border-radius: 4px; background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.12); }

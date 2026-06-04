@@ -315,6 +315,11 @@ img { max-width: 100%; display: block; }
 }
 .tab-num.salido { background: var(--oro); color: #2a1500; font-weight: 800; transform: scale(1.05); box-shadow: 0 0 14px rgba(217,119,6,.5); }
 
+/* selector de voz de la locutora */
+.voz-sel { background: rgba(255,255,255,.06); color: #f7eef0; border: 1px solid rgba(255,255,255,.14);
+  border-radius: 999px; padding: 8px 12px; font-size: .84rem; font-weight: 600; max-width: 210px; cursor: pointer; }
+.voz-sel option { color: #1c0a0e; }
+
 /* Patrón activo (mini) */
 .mini-patron { display: grid; grid-template-columns: repeat(5,1fr); gap: 4px; width: 190px; margin: 0 auto 14px; }
 .mini-patron div { aspect-ratio: 1; border-radius: 4px; background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.12); }
@@ -626,6 +631,7 @@ img { max-width: 100%; display: block; }
             <span class="intervalo">cada <input type="number" id="v-intervalo" min="1" max="120" value="5"> s</span>
             <button class="toggle" id="v-voz">🔊 Voz: ON</button>
             <button class="toggle" id="v-sfx">🔔 Efectos: ON</button>
+            <select id="v-voz-sel" class="voz-sel" title="Voz de la locutora (elige la que más te guste)"></select>
           </div>
           <div class="historial" id="v-historial"></div>
         </div>
@@ -1008,6 +1014,7 @@ const VISOR = (function () {
     patron: new Array(25).fill(true), // por defecto: cartón lleno
     voz: true,
     sfx: true,            // efectos de sonido (suspenso + timbre)
+    vozNombre: null,      // voz elegida (null = automática, mejor voz latina femenina)
     auto: false,
     intervalo: 5,         // segundos entre balotas (modo automático)
   };
@@ -1086,21 +1093,87 @@ const VISOR = (function () {
     } catch (e) {}
   }
 
-  /* ---------------- Voz ---------------- */
-  function decirVoz(texto, rate) {
+  /* ---------------- Voz: locutora latina con personalidad ---------------- */
+  let vocesES = [];
+  function cargarVoces() {
+    try {
+      const todas = speechSynthesis.getVoices() || [];
+      vocesES = todas.filter(function (v) { return /^es/i.test(v.lang); });
+      poblarSelectVoz();
+    } catch (e) {}
+  }
+  function puntajeVoz(v) {
+    const n = v.name.toLowerCase(), l = v.lang.toLowerCase();
+    let s = 0;
+    if (/es[-_](mx|us|419|co|ar|cl|pe|ve|gt)/.test(l)) s += 6;   // español latino
+    else if (l.indexOf('es') === 0) s += 1;
+    if (/paulina|sabina|dalia|paloma|marisol|francisca|isabela|catalina|estados/.test(n)) s += 4; // femeninas
+    if (/m[oó]nica|google español/.test(n)) s += 2;
+    if (/jorge|diego|carlos|juan|miguel|pablo|andr[eé]s|male|hombre/.test(n)) s -= 6; // masculinas
+    return s;
+  }
+  function mejorVoz() {
+    if (!vocesES.length) return null;
+    return vocesES.slice().sort(function (a, b) { return puntajeVoz(b) - puntajeVoz(a); })[0];
+  }
+  function getVoz() {
+    if (estado.vozNombre) {
+      const v = vocesES.find(function (x) { return x.name === estado.vozNombre; });
+      if (v) return v;
+    }
+    return mejorVoz();
+  }
+  function poblarSelectVoz() {
+    const sel = $('v-voz-sel'); if (!sel) return;
+    if (!vocesES.length) { sel.innerHTML = '<option value="">Voz del sistema</option>'; return; }
+    const elegida = getVoz();
+    sel.innerHTML = vocesES.map(function (v) {
+      const s = (elegida && v.name === elegida.name) ? ' selected' : '';
+      return '<option value="' + v.name.replace(/"/g, '') + '"' + s + '>' + v.name + ' · ' + v.lang + '</option>';
+    }).join('');
+  }
+  function decirVoz(texto, rate, pitch) {
     try {
       const u = new SpeechSynthesisUtterance(texto);
-      u.lang = 'es-ES'; u.rate = rate || 1; u.pitch = 1;
+      const v = getVoz();
+      if (v) { u.voice = v; u.lang = v.lang; } else { u.lang = 'es-MX'; }
+      u.rate = (rate == null ? 0.98 : rate);
+      u.pitch = (pitch == null ? 1.15 : pitch);   // tono cálido / tierno
       speechSynthesis.speak(u);
     } catch (e) {}
   }
-  // Doble cantada con cadencia de bingo: "B 5 ... B, cinco"
-  function hablarDoble(n) {
+
+  // Apodos clásicos de bingo (sanos, aptos para colegio)
+  const APODOS = {
+    1: '¡el primero!', 4: 'la sillita', 5: '¡los cinco sentidos!', 7: '¡el de la buena suerte!',
+    10: '¡diez, perfecto!', 11: 'los dos palillos', 12: '¡la docena!', 13: '¡con permiso!',
+    15: '¡la niña bonita!', 20: '¡todito limpio!', 21: '¡mayoría de edad!', 22: '¡los dos patitos!',
+    25: '¡bodas de plata!', 30: '¡los treinta!', 33: '¡la edad de Cristo!', 40: '¡los cuarenta!',
+    44: 'las dos sillitas', 50: '¡medio siglo!', 55: 'las dos cremalleras', 60: '¡bodas de diamante!',
+    66: 'las dos cefritas', 70: '¡setenta, firmes!', 75: '¡el último de la balota!'
+  };
+  const PATTER = [
+    'Atentos a sus cartones.', 'Marquen con cuidado.', 'La suerte está en el aire.',
+    '¿Cómo van esos cartones?', 'Recuerden completar la figura para ganar.',
+    'Mucha concentración, ¡vamos!', 'A ver de quién es la suerte hoy.',
+    '¡Esto se está poniendo emocionante!', 'Sigan muy atentos.'
+  ];
+  const FRASES_GANADOR = ['¡Tenemos bingo! ¡Muchas felicitaciones!', '¡Bingo! ¡Qué emoción!', '¡Y tenemos ganadora! ¡Felicidades!'];
+  let pasoPatter = 0;
+  function fraseGanador() { return FRASES_GANADOR[Math.floor(Math.random() * FRASES_GANADOR.length)]; }
+
+  // Canta el número con personalidad: saludo (1ª), número claro, repetición tierna + apodo, y comentario ocasional
+  function cantarNumero(n) {
     if (!estado.voz) return;
     try { speechSynthesis.cancel(); } catch (e) {}
     const l = BINGO.letraDe(n);
-    decirVoz(l + ' ' + n, 1.05);   // rápido
-    decirVoz(l + ', ' + n, 0.8);   // lento (se pronuncia "be, cinco")
+    if (estado.salidos.length === 1) {
+      decirVoz('¡Bienvenidos al bingo del Sor María Juliana! Mucha suerte a todos. ¡Comenzamos!', 1.0, 1.12);
+    }
+    decirVoz(l + ' ' + n, 1.02, 1.1);                                              // anuncio claro
+    decirVoz(l + ', ' + n + (APODOS[n] ? '. ' + APODOS[n] : ''), 0.9, 1.2);        // repetición tierna + apodo
+    pasoPatter++;
+    if (pasoPatter % 4 === 0) decirVoz(PATTER[Math.floor(Math.random() * PATTER.length)], 0.98, 1.13);
   }
 
   /* ---------------- Patrones ---------------- */
@@ -1209,7 +1282,7 @@ const VISOR = (function () {
       if (estado.sfx) sonidoTimbre();
       estado.salidos.push(n); estado.actual = n; guardar();
       marcarTablero(n); refrescarHistorial();
-      hablarDoble(n);
+      cantarNumero(n);
       sorteando = false; habilitarSacar(true);
       if (typeof onSettle === 'function') onSettle();
     }
@@ -1333,7 +1406,7 @@ const VISOR = (function () {
     g.querySelector('.sb').textContent = 'Folio ' + BINGO.folioStr(folio) + ' · ' + nombrePatron();
     g.classList.add('show');
     lanzarConfeti();
-    if (estado.voz) decirVoz('¡Bingo!', 1);
+    if (estado.voz) decirVoz(fraseGanador(), 0.95, 1.18);
   }
 
   /* ---------------- Modal editor de patrón ---------------- */
@@ -1384,11 +1457,14 @@ const VISOR = (function () {
     cargar();
     if (!iniciado) {
       construirEditor();
+      cargarVoces();
+      try { speechSynthesis.onvoiceschanged = cargarVoces; } catch (e) {}
       $('v-sacar').addEventListener('click', function () { getCtx(); sacar(); });
       $('v-nueva').addEventListener('click', nuevaPartida);
       $('v-auto').addEventListener('click', toggleAuto);
       $('v-voz').addEventListener('click', function () { getCtx(); estado.voz = !estado.voz; guardar(); actualizarToggles(); });
       $('v-sfx').addEventListener('click', function () { getCtx(); estado.sfx = !estado.sfx; guardar(); actualizarToggles(); });
+      $('v-voz-sel').addEventListener('change', function () { estado.vozNombre = this.value || null; guardar(); decirVoz('Hola, soy tu locutora del bingo.', 1.0, 1.18); });
       $('v-intervalo').addEventListener('change', function () {
         estado.intervalo = clamp(this.value, 1, 120); this.value = estado.intervalo; guardar();
         if (estado.auto) programar();
