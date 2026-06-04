@@ -14,6 +14,7 @@ const GEN = (function () {
     desde: 1,
     hasta: 1000,
     muestra: 1,
+    previewBN: false,   // vista previa en blanco y negro (como se imprime)
   };
   let iniciado = false;
 
@@ -63,7 +64,14 @@ const GEN = (function () {
   function refrescarPreview() {
     cfg.muestra = clamp(cfg.muestra, 1, BINGO.TOTAL_TABLAS);
     if ($('g-muestra')) $('g-muestra').value = cfg.muestra;
-    $('gen-preview').innerHTML = cartonHTML(BINGO.generarCarton(cfg.muestra));
+    const desde = cfg.muestra;
+    const hasta = Math.min(desde + 3, BINGO.TOTAL_TABLAS);
+    let cartones = '';
+    for (let f = desde; f <= hasta; f++) cartones += cartonHTML(BINGO.generarCarton(f));
+    $('gen-preview').innerHTML = '<div class="hoja-preview' + (cfg.previewBN ? ' bn' : '') + '">' + cartones + '</div>';
+    if ($('g-muestra-label')) $('g-muestra-label').textContent = 'Hoja: folios ' + BINGO.folioStr(desde) + ' – ' + BINGO.folioStr(hasta);
+    if ($('g-color')) $('g-color').classList.toggle('activo', !cfg.previewBN);
+    if ($('g-bn')) $('g-bn').classList.toggle('activo', cfg.previewBN);
   }
 
   // --- Auditoría de unicidad ---
@@ -135,8 +143,10 @@ const GEN = (function () {
       $('g-desde').addEventListener('change', function () { cfg.desde = clamp(this.value, 1, BINGO.TOTAL_TABLAS); this.value = cfg.desde; save(); });
       $('g-hasta').addEventListener('change', function () { cfg.hasta = clamp(this.value, 1, BINGO.TOTAL_TABLAS); this.value = cfg.hasta; save(); });
       $('g-muestra').addEventListener('change', function () { cfg.muestra = clamp(this.value, 1, BINGO.TOTAL_TABLAS); save(); refrescarPreview(); });
-      $('g-muestra-prev').addEventListener('click', function () { cfg.muestra = clamp(cfg.muestra - 1, 1, BINGO.TOTAL_TABLAS); save(); refrescarPreview(); });
-      $('g-muestra-next').addEventListener('click', function () { cfg.muestra = clamp(cfg.muestra + 1, 1, BINGO.TOTAL_TABLAS); save(); refrescarPreview(); });
+      $('g-muestra-prev').addEventListener('click', function () { cfg.muestra = clamp(cfg.muestra - 4, 1, BINGO.TOTAL_TABLAS); save(); refrescarPreview(); });
+      $('g-muestra-next').addEventListener('click', function () { cfg.muestra = clamp(cfg.muestra + 4, 1, BINGO.TOTAL_TABLAS); save(); refrescarPreview(); });
+      $('g-color').addEventListener('click', function () { cfg.previewBN = false; save(); refrescarPreview(); });
+      $('g-bn').addEventListener('click', function () { cfg.previewBN = true; save(); refrescarPreview(); });
 
       $('g-imprimir').addEventListener('click', function () { imprimir(false); });
       $('g-imprimir-muestra').addEventListener('click', function () { imprimir(true); });
