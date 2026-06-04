@@ -2,7 +2,16 @@
 
 App web autónoma (funciona **sin internet**) para un bingo de **75 balotas (B-I-N-G-O)** con capacidad para **1000 tablas**. Tiene dos módulos: **Generador de tablas** y **Visor / Balotera digital**.
 
-## ▶️ Cómo abrir
+## 🌐 App en línea (lo más fácil para compartir)
+La app está publicada en la web y **se actualiza sola** en cada cambio:
+
+### 👉 https://alguarito.github.io/bingo-smj/
+
+Comparte ese **enlace** por WhatsApp/correo: se abre en cualquier celular o computador, sin enviar archivos. (Código: https://github.com/alguarito/bingo-smj)
+
+> Para publicar cambios: ejecuta `./deploy.sh "mensaje"` (regenera el archivo único, sube a GitHub y publica en ~1 min).
+
+## ▶️ Cómo abrir (sin internet)
 Doble clic en **`index.html`** (se abre en el navegador). No requiere instalación ni conexión.
 
 > Recomendado: Google Chrome o Microsoft Edge.
