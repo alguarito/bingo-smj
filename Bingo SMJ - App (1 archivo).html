@@ -435,26 +435,41 @@ img { max-width: 100%; display: block; }
 .tab-col .cab, .bingo-letras span { background-image: linear-gradient(160deg, rgba(255,255,255,.25), rgba(0,0,0,.10)); }
 #confeti { position: fixed; inset: 0; z-index: 199; pointer-events: none; }
 
-/* --- MÓVIL (prioridad: generar el PDF desde el celular) --- */
+/* --- MÓVIL: header compacto + SOLO el generador (la balotera es para proyectar) --- */
 @media (max-width: 760px) {
-  .topbar { flex-wrap: wrap; padding: 10px 14px; gap: 8px 12px; }
-  .topbar .marca b { font-size: 1rem; }
-  .topbar nav { width: 100%; order: 3; margin-left: 0; overflow-x: auto; gap: 6px; padding-bottom: 2px; -webkit-overflow-scrolling: touch; }
-  .topbar nav button { white-space: nowrap; padding: 8px 13px; font-size: .85rem; }
-  .gen-wrap { padding: 18px 14px 48px; }
+  /* Header compacto */
+  .topbar { flex-wrap: wrap; padding: 9px 14px; gap: 8px 10px; }
+  .topbar .escudo { height: 33px; }
+  .topbar .marca b { font-size: .94rem; }
+  .topbar .marca span { font-size: .58rem; }
+  .topbar nav { width: 100%; order: 3; margin-left: 0; display: flex; gap: 8px; }
+  .topbar nav button { flex: 1 1 0; white-space: nowrap; padding: 9px 10px; font-size: .86rem; text-align: center; }
+  .topbar nav button[data-vista="visor"] { display: none; }   /* balotera oculta en móvil */
+  .nav-extra { display: none; }                                /* "Generador de tablas" -> "Generador" */
+
+  /* Inicio: solo la tarjeta del generador, centrada */
+  .menu { grid-template-columns: 1fr; gap: 16px; max-width: 440px; margin: 26px auto; }
+  .menu-card[data-vista="visor"] { display: none; }
+  .hero { padding-top: 20px; }
+  .hero h1 { font-size: 2rem; }
+  .hero .escudo-grande { height: 80px; margin-bottom: 12px; }
+  .hero p { font-size: .96rem; }
+  .bolas-deco { gap: 9px; margin: 16px 0 2px; }
+  .bola-deco { width: 44px; height: 44px; font-size: 1.2rem; }
+  .inicio-footer { font-size: .8rem; padding: 18px; }
+
+  /* Generador a todo el ancho */
+  .gen-wrap { padding: 16px 14px 44px; }
   .gen-grid { grid-template-columns: 1fr; gap: 18px; }
   .fila2 { grid-template-columns: 1fr; }
   .preview-box { position: static; }
   .preview-box .carton { width: min(86vw, 320px); }
   .acciones-gen { flex-direction: column; }
   .acciones-gen .btn { width: 100%; }
-  .hero h1 { font-size: 2.1rem; }
-  .hero .escudo-grande { height: 92px; }
-  .bola-deco { width: 46px; height: 46px; font-size: 1.25rem; }
-  .menu { gap: 16px; }
-  /* el visor es para proyectar; en móvil queda usable con scroll */
-  .visor { height: auto; }
-  .balota { width: clamp(220px, 66vw, 300px); height: clamp(220px, 66vw, 300px); }
+}
+/* En teléfonos táctiles (también horizontal) ocultar la balotera */
+@media (pointer: coarse) and (max-width: 932px) {
+  .topbar nav button[data-vista="visor"], .menu-card[data-vista="visor"] { display: none; }
 }
 
 </style>
@@ -470,7 +485,7 @@ img { max-width: 100%; display: block; }
     </div>
     <nav>
       <button data-vista="inicio">Inicio</button>
-      <button data-vista="generador">Generador de tablas</button>
+      <button data-vista="generador">Generador<span class="nav-extra"> de tablas</span></button>
       <button data-vista="visor">Visor / Balotera</button>
     </nav>
   </header>
