@@ -177,7 +177,9 @@ img { max-width: 100%; display: block; }
   font-family: var(--fuente-tit); font-weight: 700; font-size: 1.5rem;
   aspect-ratio: 1 / 1; background: #fff;
 }
-.celda.libre { font-size: .8rem; color: var(--vino); background: #fff5f6; line-height: 1; text-align: center; }
+.celda.libre { flex-direction: column; gap: 1px; color: var(--vino); background: #fff5f6; line-height: 1; text-align: center; }
+.celda.libre .est { font-size: 1.6rem; line-height: .85; }
+.celda.libre .lib { font-size: .52rem; font-weight: 800; letter-spacing: .06em; }
 .carton-foot { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; font-size: .58rem; color: var(--gris); }
 .carton-foot .lema { font-style: italic; }
 
@@ -205,7 +207,8 @@ img { max-width: 100%; display: block; }
 .hoja-preview .bingo-letras span { font-size: 1rem; border-radius: 5px; padding: 1px 0; }
 .hoja-preview .grid5 { grid-template-rows: repeat(5, 1fr); gap: 3px; }
 .hoja-preview .celda { font-size: 1rem; border-width: 1.5px; border-radius: 5px; aspect-ratio: auto; }
-.hoja-preview .celda.libre { font-size: .42rem; }
+.hoja-preview .celda.libre .est { font-size: .9rem; }
+.hoja-preview .celda.libre .lib { font-size: .3rem; }
 .hoja-preview .carton-foot { font-size: .4rem; margin-top: 4px; }
 /* modo Blanco y Negro (como se imprime de verdad) */
 .hoja-preview.bn .carton { border-color: #000; }
@@ -228,19 +231,15 @@ img { max-width: 100%; display: block; }
   #area-impresion { display: block !important; }
   @page { size: letter portrait; margin: 7mm; }
 
-  .hoja {
-    page-break-after: always; break-after: page;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    grid-template-rows: 1fr 1fr;
-    gap: 5mm;
-    height: 265mm; /* alto útil de carta con márgenes de 7mm */
-  }
+  /* FLUJO inline-flex (no grid): Chrome pagina por flujo sin partir las hojas */
+  .hoja { page-break-after: always; font-size: 0; text-align: center; }
   .hoja:last-child { page-break-after: auto; }
 
   .carton {
-    height: 100%; border-color: #000; border-radius: 5mm;
-    box-shadow: none; page-break-inside: avoid;
+    display: inline-flex; vertical-align: top;
+    width: 96mm; height: 124mm; margin: 0 1mm 5mm;
+    border-color: #000; border-radius: 5mm; box-shadow: none;
+    page-break-inside: avoid;
   }
   /* B/N económico: escudo a escala de grises y todo en negro */
   .carton .esc { filter: grayscale(100%) contrast(1.2); }
@@ -249,7 +248,7 @@ img { max-width: 100%; display: block; }
   .carton .celda { font-size: 2rem; }
   .carton .celda.libre { background: #fff !important; color: #000; } /* B/N puro para fotocopia */
   .carton-head .esc { height: 12mm; width: 12mm; }
-  .carton-head .ct .inst { font-size: 2.6mm; }
+  .carton-head .ct .inst { font-size: 2.3mm; letter-spacing: 0; }
   .carton-head .ct .ev { font-size: 3.2mm; }
 }
 
@@ -918,7 +917,7 @@ const GEN = (function () {
 
   // --- HTML de un cartón (mismo markup en pantalla e impresión) ---
   function celdaHTML(v) {
-    if (v === 'FREE') return '<div class="celda libre">★<br>LIBRE</div>';
+    if (v === 'FREE') return '<div class="celda libre"><span class="est">★</span><span class="lib">LIBRE</span></div>';
     return '<div class="celda">' + v + '</div>';
   }
   function gridHTML(grid) {

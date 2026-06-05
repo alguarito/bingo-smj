@@ -33,7 +33,7 @@ const GEN = (function () {
 
   // --- HTML de un cartón (mismo markup en pantalla e impresión) ---
   function celdaHTML(v) {
-    if (v === 'FREE') return '<div class="celda libre">★<br>LIBRE</div>';
+    if (v === 'FREE') return '<div class="celda libre"><span class="est">★</span><span class="lib">LIBRE</span></div>';
     return '<div class="celda">' + v + '</div>';
   }
   function gridHTML(grid) {
