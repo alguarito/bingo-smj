@@ -22,3 +22,19 @@ Vino Tinto institucional `#800020` + Oro `#d97706` · Escudo I.E. Sor María Jul
 
 ---
 *Institución Educativa Sor María Juliana · Cartago, Valle del Cauca*
+
+## Licencia
+
+Código: MIT (`LICENSE`). El nombre y el escudo de la I.E. Sor María Juliana pertenecen a la institución.
+
+## Cómo citar
+
+Cardenas Orozco, A. (2026). *Bingo institucional — I.E. Sor María Juliana* [Software]. https://github.com/alguarito/bingo-smj
+
+El archivo `CITATION.cff` trae la cita lista para Zotero, Mendeley y GitHub («Cite this repository»).
+
+## Autor
+
+**Alvaro Cardenas Orozco**, PhD en Ciencias de la Educación e ingeniero de sistemas · [alvarocardenasorozco.com](https://alvarocardenasorozco.com) · ORCID [0000-0003-1820-301X](https://orcid.org/0000-0003-1820-301X)
+
+¿Quiere algo así para su institución? Vea el [programa de plataforma educativa institucional](https://alvarocardenasorozco.com/desarrollo-a-medida.html) o [agende un diagnóstico gratuito de 30 minutos](https://calendly.com/alvaro-cardenas-orozco/diagnostico-institucional-30-min).

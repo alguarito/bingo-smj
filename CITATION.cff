@@ -1,0 +1,12 @@
+cff-version: 1.2.0
+message: "Si usa este trabajo, cítelo así."
+type: software
+title: "Bingo institucional — I.E. Sor María Juliana"
+abstract: "Generador de 1000 tablas únicas y balotera digital para bingos institucionales, sin instalación."
+authors:
+  - family-names: "Cardenas Orozco"
+    given-names: "Alvaro"
+    orcid: "https://orcid.org/0000-0003-1820-301X"
+license: MIT
+repository-code: "https://github.com/alguarito/bingo-smj"
+url: "https://alguarito.github.io/bingo-smj/"
